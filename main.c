@@ -2,30 +2,56 @@
 #include <stdlib.h>
 #include <string.h>
 #include <windows.h>
+#include <time.h>
 
 #define n_of_frames 6569
 #define path_size 20
 
-void progress_bar(int counter)
+#define LOADING 0
+
+#define PROJECT_NAME "C Project - '[Touhou] Bad Apple!! [ASCII ART]'"
+
+#define gotoxy(x,y) printf("\033[%d;%dH", (x), (y))
+
+void progress_bar(int counter, int mode)
 {
-    int cost, x;
+    int x;
 
     float p = (float)((float)counter/n_of_frames)*100;
 
-    cost = 25;
-    x = (counter *(68 - cost)) / n_of_frames;
+    if (mode == LOADING)
+    {
+        int cost = 25;
 
-    printf("Loading frames: %d/%d ", counter, n_of_frames);
+        x = (counter * (68 - cost)) / n_of_frames;
 
-    printf("[");
+        printf("Loading frames: %d/%d ", counter, n_of_frames);
 
-    for(int i = 0; i <= x; i++)
-        printf("#");
+        printf("[");
 
-    for(int i = 0; i < 68 - cost - x; i++)
-        printf("-");
+        for(int i = 0; i <= x; i++)
+            printf("#");
 
-    printf("] (%.1f%%)\r", p);
+        for(int i = 0; i < 68 - cost - x; i++)
+            printf("-");
+
+        printf("] (%.1f%%)\r", p);
+
+    }
+    else
+    {
+        x = (counter * 68) / n_of_frames;
+
+        printf("[");
+
+        for(int i = 0; i <= x; i++)
+            printf("#");
+
+        for(int i = 0; i < 68 - x; i++)
+            printf("-");
+
+        printf("](%.2f%%)\n", p);
+    }
 }
 
 char *get_frame(const char *file_name)
@@ -56,7 +82,6 @@ char **get_all_frames()
         sprintf(file_name, "frames\\BA%d.txt", i);
         frames[i - 1] = get_frame(file_name);
 
-        progress_bar(i);
 
         free(file_name);
     }
@@ -65,20 +90,43 @@ char **get_all_frames()
 
 int main()
 {
-    printf("Bad Apple!! In Windows Terminal.\n");
+    clock_t now, last_frame;
+
+	system("mode con: cols=80 lines=30");
+
+    printf(PROJECT_NAME);
 
     char **frames = get_all_frames();
 
-	printf("\n<Press ENTER to start>");
+	printf("\nEnjoy. <Press ENTER to start>");
 
     getchar();
 
+    system("cls");
+	printf("\nLoading...");
+
+	PlaySound("frames\\BA.wav", NULL, SND_ASYNC);
+	Sleep(514);
+	PlaySound(NULL, 0, 0); // pre loading the song
 	PlaySound("frames\\BA.wav", NULL, SND_ASYNC);
 
-    for (int i = 1; i < n_of_frames; i++)
+	system("cls");
+	gotoxy(0, 1); // reseting the cursor
+
+    last_frame = clock();
+
+    for (int i = 1; i <= n_of_frames; i++)
     {
-        printf("%s", frames[i - 1]);
-        _sleep(28);
+        now = clock();
+        int tpf = now - last_frame;
+        last_frame += 33;
+
+        if (tpf < 33) // running at 30 FPS
+        {
+            Sleep(33 - tpf);
+
+            printf("%s", frames[i - 1]);
+        }
     }
 
     return 0;
