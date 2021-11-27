@@ -17,6 +17,8 @@ char *get_frame(const char *file_name)
 {
     FILE *f = fopen(file_name, "r");
 
+    if (f == NULL) exit(1);
+
     fseek(f, 0, SEEK_END);
     long fsize = ftell(f);
     fseek(f, 0, SEEK_SET);
@@ -56,6 +58,7 @@ int main()
 
     char **frames = get_all_frames();
 
+    printf("\nPlease turn down your volume.\n");
     printf("\nEnjoy. <Press ENTER to start>");
 
     getchar();
@@ -65,11 +68,11 @@ int main()
 
     PlaySound("frames\\BA.wav", NULL, SND_ASYNC);
     Sleep(514);
-    PlaySound(NULL, 0, 0); // pre loading the song
+    PlaySound(NULL, 0, 0);
     PlaySound("frames\\BA.wav", NULL, SND_ASYNC);
 
     system("cls");
-    gotoxy(0, 1); // reseting the cursor
+    gotoxy(0, 1);
 
     last_frame = clock();
 
@@ -77,14 +80,24 @@ int main()
     {
         now = clock();
         int tpf = now - last_frame;
-        last_frame += 33;
 
-        if (tpf < 33) // running at 30 FPS
+        if (i % 30 == 0)
+            last_frame += 43;
+        else
+            last_frame += 33;
+
+        if (tpf < 33)
         {
             Sleep(33 - tpf);
             printf("%s", frames[i - 1]);
         }
     }
+
+    Sleep(1000);
+	system("cls");
+	printf("Thank you for watching.\n");
+	printf("<Press ENTER to exit>");
+	getchar();
 
     return 0;
 }
