@@ -7,11 +7,8 @@
 #define n_of_frames 6569
 #define path_size 20
 
-#define LOADING 0
-
 #define PROJECT_NAME "C Project - [Touhou] Bad Apple!! [ASCII ART]"
-
-#define gotoxy(x, y) printf("\033[%d;%dH", (x), (y))
+#define rcrs(x, y) printf("\033[%d;%dH", (x), (y))
 
 char *get_frame(const char *file_name)
 {
@@ -48,54 +45,54 @@ char **get_all_frames()
     return frames;
 }
 
+static inline void setup()
+{
+    system("mode con: cols=80 lines=30");
+    printf(PROJECT_NAME);
+    printf("\nPlease turn down your volume.\n");
+    printf("\nEnjoy. <Press ENTER to start>");
+    getchar();
+}
+
 int main()
 {
     clock_t now, last_frame;
 
-    system("mode con: cols=80 lines=30");
-
-    printf(PROJECT_NAME);
-
     char **frames = get_all_frames();
 
-    printf("\nPlease turn down your volume.\n");
-    printf("\nEnjoy. <Press ENTER to start>");
-
-    getchar();
+    setup();
 
     system("cls");
     printf("\nLoading...");
 
-    PlaySound("frames\\BA.wav", NULL, SND_ASYNC);
-    Sleep(514);
-    PlaySound(NULL, 0, 0);
+    Sleep(500);
     PlaySound("frames\\BA.wav", NULL, SND_ASYNC);
 
     system("cls");
-    gotoxy(0, 1);
+    rcrs(0, 1);
 
     last_frame = clock();
 
     for (int i = 1; i <= n_of_frames; i++)
     {
         now = clock();
-        int tpf = now - last_frame;
+        int delta = now - last_frame;
 
         if (i % 30 == 0)
             last_frame += 43;
         else
             last_frame += 33;
 
-        if (tpf < 33)
+        if (delta < 33)
         {
-            Sleep(33 - tpf);
+            Sleep(33 - delta);
             printf("%s", frames[i - 1]);
         }
     }
 
-    Sleep(1000);
+    Sleep(250);
 	system("cls");
-	printf("Thank you for watching.\n");
+	printf("Thanks for watching.\n");
 	printf("<Press ENTER to exit>");
 	getchar();
 
