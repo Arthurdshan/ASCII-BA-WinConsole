@@ -12,7 +12,7 @@
 
 static inline void setup()
 {
-	system("CHCP 932");
+    system("CHCP 932");
     system("mode con: cols=80 lines=40");
 
     printf(PROJECT_NAME);
@@ -36,7 +36,8 @@ char *get_frame(const char *file_name)
 {
     FILE *f = fopen(file_name, "r");
 
-    if (f == NULL) exit(1);
+    if (f == NULL)
+        exit(1);
 
     fseek(f, 0, SEEK_END);
     long fsize = ftell(f);
@@ -69,7 +70,7 @@ char **get_all_frames()
 
 int main()
 {
-	int time_sec, count_t, min, sec, delta;
+    int time_sec, count_t, min, sec, delta;
     clock_t now, last_frame, start_time;
 
     char **frames = get_all_frames();
@@ -85,7 +86,7 @@ int main()
     {
         now = clock();
         delta = now - last_frame;
-		time_sec = (now - start_time) / CLOCKS_PER_SEC;
+        time_sec = (now - start_time) / CLOCKS_PER_SEC;
         min = time_sec / 60;
         sec = time_sec % 60;
 
@@ -104,25 +105,25 @@ int main()
 
             printf("%s", frames[i - 1]);
 
-		    printf("\n ------------------------\n");
-			printf(" | Elapsed Time: %02d:%02d  |\n | Frame: %04d/%d     |", min, sec, i, n_of_frames);
-			printf("\n ------------------------\n");
+            printf("\n ------------------------\n");
+            printf(" | Elapsed Time: %02d:%02d  |\n | Frame: %04d/%d     |", min, sec, i, n_of_frames);
+            printf("\n ------------------------\n");
 
             rcrs(0, 1);
         }
     }
 
-    for(int i = 0; i < n_of_frames; i++)
+    for (int i = 0; i < n_of_frames; i++)
     {
         free(frames[i]);
     }
     free(frames);
 
     Sleep(250);
-	system("cls");
-	printf("Thank you for watching.\n");
-	printf("Press enter to exit.\n");
-	getchar();
+    system("cls");
+    printf("Thank you for watching.\n");
+    printf("Press enter to exit.\n");
+    getchar();
 
     return 0;
 }
