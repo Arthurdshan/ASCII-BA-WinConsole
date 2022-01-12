@@ -7,15 +7,16 @@
 #define n_of_frames 6569
 #define path_size 20
 
-#define PROJECT_NAME "C Project - [Touhou] Bad Apple!! [ASCII ART]"
+#define TITLE "[Touhou] Bad Apple!!"
 #define rcrs(x, y) printf("\033[%d;%dH", (x), (y))
+#define hide_crs() printf("\e[?25l")
 
-static inline void setup()
+void setup()
 {
     system("CHCP 932");
-    system("mode con: cols=80 lines=40");
+    system("mode con: cols=80 lines=38");
 
-    printf(PROJECT_NAME);
+    printf(TITLE);
 
     printf("\nEnjoy. <Press ENTER to start>");
 
@@ -25,7 +26,7 @@ static inline void setup()
     printf("\nLoading...");
 
     PlaySound("frames\\BA.wav", NULL, SND_ASYNC);
-    Sleep(500);
+    Sleep(250);
     PlaySound(NULL, 0, 0);
 
     system("cls");
@@ -68,9 +69,16 @@ char **get_all_frames()
     return frames;
 }
 
+void print_progress_box(int min, int sec, int frame, int total_frames)
+{
+    printf("\n -----------------------------------------------------------------------------\n");
+    printf(" | Elapsed Time: %02d:%02d \t\t\t\t\t    Frame: %04d/%d |", min, sec, frame, total_frames);
+    printf("\n -----------------------------------------------------------------------------\n");
+}
+
 int main()
 {
-    int time_sec, count_t, min, sec, delta;
+    int time_sec, min, sec, delta;
     clock_t now, last_frame, start_time;
 
     char **frames = get_all_frames();
@@ -79,47 +87,38 @@ int main()
 
     PlaySound("frames\\BA.wav", NULL, SND_ASYNC);
 
-    last_frame = clock();
-    start_time = clock();
+    start_time = last_frame = clock();
 
     for (int i = 1; i <= n_of_frames; i++)
     {
         now = clock();
         delta = now - last_frame;
+        last_frame += i % 30 == 0 ? 43 : 33;
+
         time_sec = (now - start_time) / CLOCKS_PER_SEC;
         min = time_sec / 60;
         sec = time_sec % 60;
-
-        if (i % 30 == 0)
-            last_frame += 43;
-        else
-            last_frame += 33;
 
         if (delta < 33)
         {
             Sleep(33 - delta);
 
-            printf("\e[?25l");
+            hide_crs();
 
-            printf("%s\n\n", PROJECT_NAME);
+            printf("%s\n\n", TITLE);
 
             printf("%s", frames[i - 1]);
 
-            printf("\n ------------------------\n");
-            printf(" | Elapsed Time: %02d:%02d  |\n | Frame: %04d/%d     |", min, sec, i, n_of_frames);
-            printf("\n ------------------------\n");
+            free(frames[i - 1]);
+
+            print_progress_box(min, sec, i, n_of_frames);
 
             rcrs(0, 1);
         }
     }
 
-    for (int i = 0; i < n_of_frames; i++)
-    {
-        free(frames[i]);
-    }
     free(frames);
 
-    Sleep(250);
     system("cls");
     printf("Thank you for watching.\n");
     printf("Press enter to exit.\n");
